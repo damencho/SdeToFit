@@ -38,6 +38,7 @@ public class SuuntoSml implements Dive, DivesSource {
 	private final String productName;
 	private final long serialNumber;
 	private final long diveNumber;
+	private final long surfaceTime;
 	private final float maxDepth, meanDepth;
 
 	private final Element suunto;
@@ -88,6 +89,8 @@ public class SuuntoSml implements Dive, DivesSource {
 
 		// TODO: fix this, as far as I could find the total dive number is not kept in SML
 		this.diveNumber = Integer.valueOf(suunto.getElementsByTagName("NumberInSeries").item(0).getTextContent());
+
+		this.surfaceTime = Integer.valueOf(suunto.getElementsByTagName("SurfaceTime").item(0).getTextContent());
 
 		this.productName = suunto.getElementsByTagName("Name").item(0).getTextContent();
 		this.serialNumber = Long.valueOf(suunto.getElementsByTagName("SerialNumber").item(0).getTextContent());
@@ -181,7 +184,7 @@ public class SuuntoSml implements Dive, DivesSource {
 
     @Override
     public long getSurfaceTime() {
-        throw new UnsupportedOperationException();
+        return this.surfaceTime;
     }
 
 	@Override
