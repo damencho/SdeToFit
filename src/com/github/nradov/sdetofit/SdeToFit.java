@@ -1,9 +1,10 @@
 package com.github.nradov.sdetofit;
 
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.zip.ZipException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -17,7 +18,6 @@ import com.garmin.fit.DiveSummaryMesg;
 import com.garmin.fit.Event;
 import com.garmin.fit.EventMesg;
 import com.garmin.fit.EventType;
-import com.garmin.fit.File;
 import com.garmin.fit.FileEncoder;
 import com.garmin.fit.FileIdMesg;
 import com.garmin.fit.Fit;
@@ -69,7 +69,27 @@ public final class SdeToFit {
 	}
 
 	public void convert() throws ZipException, IOException, ParserConfigurationException, SAXException {
-		final DivesSource divesSource = DivesSourceFactory.create(input);
+		java.io.File inputfile = input.toFile();
+
+		if (!inputfile.exists()) {
+			throw new IllegalArgumentException("Input file does not exist: " + input);
+		}
+
+		if (inputfile.isFile()) {
+			this.convertFile(input);
+		} else {
+            File[] listFiles = inputfile.listFiles((dir, name) -> name.endsWith(DivesSourceFactory.FileExtension.SUUNTO_DIVE_EXPORT)
+                    || name.endsWith(DivesSourceFactory.FileExtension.XML)
+                    || name.endsWith(DivesSourceFactory.FileExtension.SML));
+
+			for (File f : Objects.requireNonNull(listFiles)) {
+				this.convertFile(f.toPath());
+            }
+		}
+	}
+
+	private void convertFile(final Path file) throws IOException, ParserConfigurationException, SAXException {
+		final DivesSource divesSource = DivesSourceFactory.create(file);
 		for (final Dive dive : divesSource.getDives()) {
 			createDiveFitFile(dive);
 		}
@@ -91,7 +111,7 @@ public final class SdeToFit {
 		final var encode = new FileEncoder(new java.io.File(filename), Fit.ProtocolVersion.V2_0);
 
 		final var fileIdMesg = new FileIdMesg();
-		fileIdMesg.setType(File.ACTIVITY);
+		fileIdMesg.setType(com.garmin.fit.File.ACTIVITY);
 		fileIdMesg.setManufacturer(Manufacturer.SUUNTO);
 		fileIdMesg.setTimeCreated(dive.getStartTime());
 		fileIdMesg.setSerialNumber(dive.getSerialNumber());

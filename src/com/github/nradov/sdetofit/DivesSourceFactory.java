@@ -27,7 +27,7 @@ public final class DivesSourceFactory {
 	}
 
 	/** Constants for supported dive log file extensions. */
-	private static final class FileExtension {
+	public static final class FileExtension {
 
 		/** Suunto dive export. */
 		final static String SUUNTO_DIVE_EXPORT = ".sde";
