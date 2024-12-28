@@ -118,6 +118,7 @@ public class SuuntoSml implements Dive, DivesSource {
 				.valueOf(suunto.getElementsByTagName("SampleInterval").item(0).getTextContent());
 		final int diveSeconds = sampleCount * sampleInterval;
 		final DateTime dateTime = new DateTime(start);
+		float currentTemperature = -1;
 
 		for (int i = 0; i < samples.getLength(); i++) {
 			final var sample = (Element) samples.item(i);
@@ -131,8 +132,13 @@ public class SuuntoSml implements Dive, DivesSource {
 			}
 
 			final float depth = Float.valueOf(sample.getElementsByTagName("Depth").item(0).getTextContent());
-			final float temperature = Float.valueOf(sample.getElementsByTagName("Temperature").item(0).getTextContent()) - 273.15f;
-			final var record = new Record(dateTime, depth, (byte) temperature);
+			NodeList tempList = sample.getElementsByTagName("Temperature");
+
+			if (tempList.getLength() > 0) {
+				currentTemperature = Float.valueOf(tempList.item(0).getTextContent()) - 273.15f;
+			}
+
+			final var record = new Record(dateTime, depth, (byte) currentTemperature);
 			records.add(record);
 			dateTime.add(sampleInterval);
 		}
