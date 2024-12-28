@@ -78,7 +78,13 @@ public class SuuntoSml implements Dive, DivesSource {
 		end = new DateTime(((startCalendar.getTimeInMillis() - SdeToFit.OFFSET_MS) / 1000) + diveTimeSec);
 
 		this.maxDepth = Float.parseFloat(suunto.getElementsByTagName("Max").item(0).getTextContent());
-		this.meanDepth = Float.parseFloat(suunto.getElementsByTagName("Avg").item(0).getTextContent());
+
+		NodeList avgList = suunto.getElementsByTagName("Avg");
+		if (avgList.getLength() > 0) {
+			this.meanDepth = Float.parseFloat(avgList.item(0).getTextContent());
+		} else {
+			this.meanDepth = -1;
+		}
 
 		// TODO: fix this, as far as I could find the total dive number is not kept in SML
 		this.diveNumber = Integer.valueOf(suunto.getElementsByTagName("NumberInSeries").item(0).getTextContent());

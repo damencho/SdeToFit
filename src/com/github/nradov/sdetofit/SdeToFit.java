@@ -133,7 +133,9 @@ public final class SdeToFit {
 		final var diveSummaryMesg1 = new DiveSummaryMesg();
         diveSummaryMesg1.setSurfaceInterval(dive.getSurfaceTime());
 		diveSummaryMesg1.setTimestamp(dive.getStartTime());
-		diveSummaryMesg1.setAvgDepth(dive.getAvgDepth());
+		if (dive.getAvgDepth() != -1) {
+			diveSummaryMesg1.setAvgDepth(dive.getAvgDepth());
+		}
 		diveSummaryMesg1.setMaxDepth(dive.getMaxDepth());
 		diveSummaryMesg1.setDiveNumber(dive.getDiveNumber());
 		diveSummaryMesg1.setBottomTime(dive.getBottomTime());
